@@ -1,10 +1,18 @@
 //importa as funçoes necessarias do firebase
-import { initializeApp } from "";
-import { getAuth, GoogleProvider, signInWithPopup, signOut, onAuthStateChanged, createUserWithEmailAndPassword, signInWithEmailAndPassword } from "";
-import { getFirestore, setDoc, doc } from "";
+import { initializeApp } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-app.js";
+import { getAuth, GoogleProvider, signInWithPopup, signOut, onAuthStateChanged, createUserWithEmailAndPassword, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-auth.js";
+import { getFirestore, setDoc, doc } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-firestore.js";
 
 //Configs do FB
-
+  const firebaseConfig = {
+    apiKey: "AIzaSyDayYVtUeALRs023AcKWOYrhy6ba7HdY3k",
+    authDomain: "ddmi-firebaseauth.firebaseapp.com",
+    projectId: "ddmi-firebaseauth",
+    storageBucket: "ddmi-firebaseauth.firebasestorage.app",
+    messagingSenderId: "59644166518",
+    appId: "1:59644166518:web:3986bc0b29411fa21eba57",
+    measurementId: "G-TXXHW6Z86Z"
+  };
 
 //Inicia o FB
 const app = initializeApp(firebaseConfig);
@@ -66,17 +74,32 @@ signUp.addEventListener('click', (event) => {
         });
 });
 
-//Lógica de login de3 usuários existentes
+//Lógica de login de usuários existentes
 const signIn = document.getElementById('submitSigIn');
-signIn.addEventListener('clcik', (event) => {
+signIn.addEventListener('click', (event) => {
 
     event.preventDefault(); //Previne o comportamento do botão
 
-    //adicioa os dados forms de login
-    const email = document.getElementById('rEmail').value;
-    const password = document.getElementById('rPassword').value;
+    //adiciona os dados forms de login
+    const email = document.getElementById('email').value;
     const auth = getAuth(); //configura o serviço de autenticação
 
     //realiza o login com email e senha
+    signInWithEmailAndPassword(auth, email, password)
+    .then((userCredential) => {
+        showMessage('Usuário Logado com sucesso', 'signInMessage') //Exibe mensagem de sucesso
+        const user = userCredential.user;
 
+        //salva o id do usuario no localStorage
+        localStorage.setItem('loggedInUserId', user.uid);
+        window.location.href = 'homepage.html'; //redireciona para a pagina inicial
+    })
+    .catch((error) => {
+        const errorCode = error.code;
+        if (errorCode === 'auth/invalid-credential') {
+            showMessage('Email ou Senha incorreta', 'sigInMessage');
+        } else {
+            showMessage('Essa conta não existe', 'sigInMessage');
+        }
+    });
 })
