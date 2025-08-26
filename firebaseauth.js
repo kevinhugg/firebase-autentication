@@ -1,6 +1,6 @@
 //importa as funçoes necessarias do firebase
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-app.js";
-import { getAuth, GoogleProvider, signInWithPopup, signOut, onAuthStateChanged, createUserWithEmailAndPassword, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-auth.js";
+import { getAuth, GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged, createUserWithEmailAndPassword, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-auth.js";
 import { getFirestore, setDoc, doc } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-firestore.js";
 
 //Configs do FB
@@ -22,12 +22,12 @@ function showMessage(message, divId) {
 
     var messageDiv = document.getElementById(divId);
     messageDiv.style.display = "block";
-    messageDiv.innerHTML.display = message;
+    messageDiv.innerHTML = message;
     messageDiv.style.opacity = 1;
 
     setTimeout(function(){
         messageDiv.style.opacity = 0;
-    }, 5000); //a m,esagem desaparece depois de 5 segundos
+    }, 5000); //a mesagem desaparece depois de 5 segundos
 
 }
 
@@ -52,7 +52,7 @@ signUp.addEventListener('click', (event) => {
         const user = userCredential.user; //Usuário autenticado
         const userData = { email, firstName, lastName }; //dados do usuario para salvar
 
-        showMessage('Conta criada com sucesso', 'signUp') //Exibe uma mensagem de sucesso
+        showMessage('Conta criada com sucesso', 'signUpMessage') //Exibe uma mensagem de sucesso
 
         //Salva os dados do usuário no firestore
         const docRef = doc(db, "users", user.uid);
@@ -65,23 +65,24 @@ signUp.addEventListener('click', (event) => {
         });
     })
     .catch((error) => {
-            console.errorCode = error.code;
-            if (errorCode == 'auth/email-already') {
+            const errorCode = error.code;
+            if (errorCode == 'auth/email-already-in-use') {
                 showMessage('Endereço de email já existe', 'signUpMessage');
             } else {
                 showMessage('Não é possível criar usuário', 'signUpMessage');
             }
         });
-});
+}); 
 
 //Lógica de login de usuários existentes
-const signIn = document.getElementById('submitSigIn');
+const signIn = document.getElementById('submitSignIn');
 signIn.addEventListener('click', (event) => {
 
     event.preventDefault(); //Previne o comportamento do botão
 
     //adiciona os dados forms de login
     const email = document.getElementById('email').value;
+    const password = document.getElementById('password').value;
     const auth = getAuth(); //configura o serviço de autenticação
 
     //realiza o login com email e senha
@@ -97,9 +98,9 @@ signIn.addEventListener('click', (event) => {
     .catch((error) => {
         const errorCode = error.code;
         if (errorCode === 'auth/invalid-credential') {
-            showMessage('Email ou Senha incorreta', 'sigInMessage');
+            showMessage('Email ou Senha incorreta', 'signInMessage');
         } else {
-            showMessage('Essa conta não existe', 'sigInMessage');
+            showMessage('Essa conta não existe', 'signInMessage');
         }
     });
 })
